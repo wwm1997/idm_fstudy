@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName">
+            <value>com.mysql.jdbc.Driver</value>
+        </property>
+        <property name="url">
+            <value>jdbc:mysql://192.168.132.38:3309/shareniu-idm?characterEncoding=UTF-8&amp;useSSL=false&amp;createDatabaseIfNotExist=true
+            </value>
+        </property>
+        <property name="username">
+            <value>ws</value>
+        </property>
+        <property name="password" value="unionmanws"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="processEngineConfiguration" class="com.shareniu.bpmn.spring.ShareniuSpringProcessEngineConfiguration">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="databaseSchemaUpdate" value="true"/>
+        <property name="databaseType" value="mysql"></property>
+        <!--isAsyncHistoryEnabled-->
+        <property name="asyncHistoryEnabled" value="true"></property>
+        <property name="asyncHistoryExecutorActivate" value="true"></property>
+        <!--<property name="asyncExecutorActivate" value="true"></property>-->
+      <property name="historyLevel" value="AUDIT"></property>
+        <!--<property name="deploymentResources" value="classpath*:*.bpmn"></property>-->
+        <!--<property name="deploymentMode" value="single-resource"></property>-->
+        <!--<property name="deploymentMode" value="resource-parent-folder"></property>-->
+        <!--是否部署资源的时候生成流程图-->
+        <property name="createDiagramOnDeploy" value="true"></property>
+
+        <!--protected String activityFontName = "Arial";-->
+        <!--protected String labelFontName = "Arial";-->
+        <!--protected String annotationFontName = "Arial";-->
+
+        <property name="activityFontName" value="宋体"></property>
+        <property name="labelFontName" value="宋体"></property>
+        <property name="annotationFontName" value="宋体"></property>
+        <!--<property name="idBlockSize" value="1000"></property>-->
+        <!--<property name="idGenerator" ref="shareniuUuidGenerator"></property>-->
+        <property name="processDiagramGenerator">
+            <bean class="com.shareniu.bpmn.ch14.ShareniuDefaultProcessDiagramGenerator"></bean>
+
+        </property>
+        <property name="drawSequenceFlowNameWithNoLabelDI" value="true"></property>
+        <property name="processInstanceHelper" >
+            <bean class="com.shareniu.bpmn.ch8.ShareniuProcessInstanceHelper"></bean>
+        </property>
+    </bean>
+    <bean id="strongUuidGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"></bean>
+
+    <bean id="shareniuUuidGenerator" class="com.shareniu.bpmn.ch7.ShareniuUuidGenerator"></bean>
+    <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
+        <property name="processEngineConfiguration" ref="processEngineConfiguration"/>
+    </bean>
+    <bean id="okReturningService" class="com.shareniu.bpmn.ch9.OkReturningService"></bean>
+    <bean id="serviceTaskClass" class="com.shareniu.bpmn.ch9.ServiceTaskClass"></bean>
+    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService"/>
+    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService"/>
+    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService"/>
+    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
+    <bean id="formService" factory-bean="processEngine" factory-method="getFormService"/>
+    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
+
+</beans>
